@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Project 4</title>
+  <link href="https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <style>
+    :root {
+      --mdc-theme-primary: navy;
+    }
+
+    body {margin: 0;}
+    main {margin-left: 8px;}
+    
+    .view {display: none;}
+  </style>
+
+  </head>
+  <body>  
+    
+
+    <header class="mdc-top-app-bar">
+      <div class="mdc-top-app-bar__row">
+        <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+          <span class="mdc-top-app-bar__title">COVID-19</span>
+        </section>
+        <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
+          <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button topBarButton" value="home" aria-label="Home">home</button>
+          <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button topBarButton" value="one" aria-label="Search">search</button>
+          <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button topBarButton" value="two" aria-label="Table">table_chart</button>
+          <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button topBarButton" value="three" aria-label="Chart">show_chart</button>
+        </section>
+      </div>
+    </header>
+
+
+
+    <main class="mdc-top-app-bar--fixed-adjust">
+
+
+      <div class="" id="home">
+         <h1>Welcome</h1>
+         <p>Data source can be found at <a href="https://pomber.github.io/covid19/timeseries.json" target="_blank">https://pomber.github.io/covid19/timeseries.json</a></p>
+     </div> 
+
+     <div class="view" id="one">
+         <h1>Select Countries</h1>
+         <p>Find countries by typing and then add them to the list. Click chart once satisfied with the list</p>
+         <input id="countryInput" list="countries">
+
+         <datalist id="countries">
+         </datalist>
+         <button class="mdc-button foo-button mdc-button--raised">
+             <div class="mdc-button__ripple"></div>
+             <span class="mdc-button__label">Add</span>
+         </button>
+
+         <button class="mdc-button bar-button mdc-button--raised">
+             <div class="mdc-button__ripple"></div>
+             <span class="mdc-button__label">Chart</span>
+         </button>
+
+         <ul class="mdc-list" id="countriesAdded">
+        </ul>
+
+     </div> 
+
+
+
+     <div class="view" id="two">
+         <h1>Table</h1>
+         <h3>Number of Deaths</h3>
+         <div class="mdc-data-table">
+          <table class="mdc-data-table__table" aria-label="Dessert calories">
+            <thead>
+              <tr class="mdc-data-table__header-row">
+                <th class="mdc-data-table__header-cell">Date</th>
+              </tr>
+            </thead>
+            <tbody class="mdc-data-table__content">
+            </tbody>
+          </table>
+        </div>
+     </div>
+
+
+     <div class="view" id="three">
+         <h1>Chart</h1>
+         <div id="piechart" style="width: 1500px; height: 1000px;"></div>
+     </div> 
+    </main>
+
+
+    <script>
+        
+        //init material componenents
+        mdc.ripple.MDCRipple.attachTo(document.querySelector('.foo-button'));
+        mdc.ripple.MDCRipple.attachTo(document.querySelector('.bar-button'));
+        mdc.topAppBar.MDCTopAppBar.attachTo(document.querySelector('header.mdc-top-app-bar'));
+        mdc.dataTable.MDCDataTable.attachTo(document.querySelector('.mdc-data-table'));  
+        
+        //grab some nodes that will be used later
+        let countryInput = document.querySelector('#countryInput');
+        let inputList = document.querySelector('#countriesAdded'); 
+        let countryDataList = document.querySelector('#countries');
+        let tableHeader = document.querySelector('.mdc-data-table__header-row');
+        let tableContent = document.querySelector('.mdc-data-table__content');
+        
+        //init global variables
+        let countryArray = [];  
+        let fetchedData = null;
+
+
+        //add countries to countryArray when add button is clicked  
+        document.querySelector('.foo-button').addEventListener('click', event => {
+            
+            //first check if there is a value
+            if(countryInput.value != ''){
+                //add to list
+                let listItem = document.createElement('li');
+                listItem.classList.add('mdc-list-item');
+                mdc.ripple.MDCRipple.attachTo(listItem);
+                
+                let textItem = document.createElement('span');
+                textItem.classList.add('mdc-list-item__text');
+                textItem.appendChild(document.createTextNode(countryInput.value));
+
+                listItem.appendChild(textItem);
+                inputList.appendChild(listItem);
+                
+                //keep track of countries
+                countryArray.push(countryInput.value);
+            }
+            
+            //make input blank
+            countryInput.value = '';
+        });
+
+
+        //functionality when chart button is clicked
+        document.querySelector('.bar-button').addEventListener('click', event => {
+            //used to store data for chart
+            let pieChartVals = [];
+            
+            //first check if countries were added
+            if(countryArray.length > 0){
+                
+                //create table rows with data ----------------------
+                let tr = document.createElement('tr');
+                tr.classList.add('mmdc-data-table__row');
+
+
+                fetchedData[countryArray[0]].forEach( (date) => {
+                    let td = document.createElement('td');
+                    td.classList.add('mdc-data-table__cell');
+                    td.appendChild(document.createTextNode(date));
+
+                })
+                
+                tableContent.appendChild
+                //---------------------------------------------------
+                
+                //add headers to graph data
+                pieChartVals.push(['Country', 'Total']);
+                
+                //variable used to find length of each array
+                let numValues = fetchedData[countryArray[0]].length;
+                
+                //loop through every country selected
+                countryArray.forEach( (country) => {
+                    
+                    //create and add table header for each country
+                    let header = document.createElement('th');
+                    header.classList.add('mdc-data-table__header-cell');
+                    header.appendChild(document.createTextNode(country));
+                    tableHeader.appendChild(header);
+                    
+                    //store data used for graph for each country
+                    let temp = [];
+                    temp.push(country);
+                    temp.push(fetchedData[country][numValues-1]["deaths"]);
+                    pieChartVals.push(temp);
+                });
+
+
+                //for loop to add data for table in descending date order
+                for(let i=numValues-1; i > -1; i--){
+                    let tr = document.createElement('tr');
+                    tr.classList.add('mmdc-data-table__row');
+
+                    let td = document.createElement('td');
+                    td.classList.add('mdc-data-table__cell');
+                    td.appendChild(document.createTextNode(fetchedData[countryArray[0]][i].date));
+
+                    tr.appendChild(td);
+
+                    countryArray.forEach( (country) => {
+                        let td2 = document.createElement('td');
+                        td2.classList.add('mdc-data-table__cell');
+                        td2.appendChild(document.createTextNode(fetchedData[country][i].deaths));
+                        tr.appendChild(td2);
+                    });
+                    tableContent.appendChild(tr);
+                }
+            }//end of if
+
+            //draw pie chart and switch views
+            drawChart(pieChartVals);
+            hideViews();
+            document.querySelector('#two').style.display = "block";
+
+        });
+
+
+        
+        //fetch request of all data + population of datalist
+        fetch("https://pomber.github.io/covid19/timeseries.json")
+          .then(response => response.json())
+          .then(data => {
+            Object.keys(data).forEach( (key) => {
+                    let listOption = document.createElement('option');
+                    listOption.value = ''+key;
+
+                    countryDataList.appendChild(listOption);                  
+            });
+            fetchedData = data;
+          });  
+
+
+
+          //function to hide all views
+          hideViews = () => {
+             document.querySelectorAll('.view').forEach(item => {
+
+                item.style.display="none";
+
+            });
+              document.querySelector('#home').style.display="none";
+          }
+
+
+          //add functionality to all topbar icons for views
+          document.querySelectorAll('.topBarButton').forEach(item => {
+               item.addEventListener('click', event => {
+
+                 hideViews();
+                 let val = item.value;
+                 document.querySelector("#"+val).style.display="block";
+               })
+          });
+
+
+          //google chart
+          google.charts.load('current', {'packages':['corechart']});
+          
+          //function to draw graph with given data
+          let drawChart = (addedData) => {
+
+            var data = google.visualization.arrayToDataTable(addedData);                  
+
+            var options = {
+              title: 'Total Number Deaths',
+              width: 900,
+              height: 500
+            };
+
+            var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+            chart.draw(data, options);
+        }
+    </script>
+  </body>
+</html>
