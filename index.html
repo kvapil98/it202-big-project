@@ -21,6 +21,15 @@
       
       #countriesAdded {
           width:500px}  
+      
+      .demo-card {
+          height: 500px;
+          width: 350px;
+        }
+      
+      .demo-card__primary-action{
+          height: 500px;
+      }
   </style>
 
   </head>
@@ -36,7 +45,7 @@
           <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button topBarButton" value="home" aria-label="Home">home</button>
           <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button topBarButton" value="one" aria-label="Search">search</button>
           <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button topBarButton" value="two" aria-label="Table">table_chart</button>
-          <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button topBarButton" value="three" aria-label="Chart">show_chart</button>
+          <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button topBarButton" value="three" aria-label="Chart">location_on</button>
         </section>
       </div>
     </header>
@@ -52,7 +61,7 @@
      </div> 
 
      <div class="view" id="one">
-         <h1>Select Countries</h1>
+         <h1>Select States</h1>
          <p>Find countries by typing and then add them to the list. Click chart once satisfied with the list</p>
          <input id="statesInput" list="states">
 
@@ -93,9 +102,35 @@
 
 
      <div class="view" id="three">
-         <h1>Chart</h1>
-         <div id="piechart" style="width: 1500px; height: 1000px;"></div>
-     </div> 
+         <h1>Location</h1>
+         
+         <div class="mdc-card demo-card demo-basic-with-header">
+<!--           <div class="demo-card__primary">
+            <h1 class="demo-card__title mdc-typography mdc-typography--headline6">Current Weather</h1>
+            <h2 class="demo-card__subtitle mdc-typography mdc-typography--subtitle2">37&#0176</h2>
+          </div> -->
+          <div class="mdc-card__primary-action demo-card__primary-action" tabindex="0">
+            <div class="mdc-card__media mdc-card__media--16-9 demo-card__media" style="background-image: url(&quot;https://www.alabamawx.com/wp-content/uploads/2017/03/shutterstock_240459751-600x400.jpg&quot;);">
+              <div class="mdc-card__media-content demo-card__media-content">
+                <div class="demo-card__primary">
+                  <h1 class="demo-card__title mdc-typography mdc-typography--headline6" style="font-size: 26px;font-style: italic;">Current Weather</h1>
+                  <h1 class="demo-card__subtitle mdc-typography mdc-typography--subtitle2" id="currTemp" style="font-size: xxx-large;"></h1>
+                </div>
+              </div>
+            </div>
+            <div class="demo-card__secondary mdc-typography mdc-typography--body2">
+                <h1>Details</h1>
+                <h3 id="currFeelsLike">Feels like: 60&#0176</h3>
+                <h3 id="currTempHigh">Temp High: 60&#0176</h3>
+                <h3 id="currTempLow">Temp Low: 55&#0176</h3>
+                <h3 id="currHumidity">Humidity: 47%</h3>
+                <h3 id="currWind">Wind Speed: 14mph</h3>
+
+            </div>
+          </div>
+        </div>
+     </div>
+        
     </main>
 
 
@@ -116,6 +151,14 @@
         let tableHeader = document.querySelector('.mdc-data-table__header-row');
         let tableContent = document.querySelector('.mdc-data-table__content');
         
+        //weather DOM components
+        let currTemp = document.querySelector('#currTemp');
+        let currFeelsLike = document.querySelector('#currFeelsLike');
+        let currTempHigh = document.querySelector('#currTempHigh');
+        let currTempLow = document.querySelector('#currTempLow');
+        let currHumidity = document.querySelector('#currHumidity');
+        let currWind = document.querySelector('#currWind');
+        
         //init global variables
         let statesArray = [];  
         let fetchedData = null;
@@ -128,6 +171,14 @@
             stateDataList.appendChild(listOption);                  
          });        
         
+
+//         let url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=42.1928236,-88.21689320000002&key=AIzaSyBGigYPYNDYIjMBPJowjOEAebOqmx-9aWM"
+//           fetch(url)
+//           .then(response => response.json())
+//           .then(data => {
+//             console.log(data);
+//             //fetchedData = data;
+//           });  
         
         //add countries to statesArray when add button is clicked  
         document.querySelector('.foo-button').addEventListener('click', event => {
@@ -287,11 +338,46 @@
 
                  hideViews();
                  let val = item.value;
+                 
+                 //geolocation routine
+                 if(val == "three"){
+                     getGeolocationInfo();
+                 }  
+                   
                  document.querySelector("#"+val).style.display="block";
                })
           });
 
-
+            
+            let getGeolocationInfo = () => {
+              console.log("correct");
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(showPosition);
+                } else {
+                    alert("Geolocation is not supported by this browser.");
+                }
+            }
+            
+          
+            let showPosition = (position) => {
+                console.log(position.coords.latitude + " " + position.coords.longitude);
+                let weatherUrl = "https://api.openweathermap.org/data/2.5/weather?lat="+position.coords.latitude+"&lon=" +position.coords.longitude+"&units=imperial&appid=b2413ddb608f02bb63cf6e2a9c922b62";
+                //let weatherUrl = "https://api.openweathermap.org/data/2.5/weather?lat=35&lon=139&appid=b2413ddb608f02bb63cf6e2a9c922b62";
+                fetch(weatherUrl)
+                  .then(response => response.json())
+                  .then(data => {
+                    //console.log(data);
+                    currTemp.textContent = data.main.temp + String.fromCharCode(176); 
+                    currFeelsLike.textContent = "Feels Like:  " + data.main["feels_like"] + String.fromCharCode(176);
+                    currTempHigh.textContent = "Temp High: "+data.main["temp_max"] + String.fromCharCode(176);
+                    currTempLow.textContent = "Temp Low: " + data.main["temp_min"] + String.fromCharCode(176);
+                    currHumidity.textContent = "Humidity: "+data.main.humidity + "%";
+                    currWind.textContent = "Wind Speed: "+data.wind.speed + "mph";
+                    //fetchedData = data;
+                  });  
+                
+            }
+          
           //google chart
           google.charts.load('current', {'packages':['corechart']});
           
