@@ -3,20 +3,24 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
-    <title>Project 4</title>
+    <title>Big Project</title>
   <link href="https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.css" rel="stylesheet">
   <script src="https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.js"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+      <script type="text/javascript" src="states.js"></script>
   <style>
     :root {
-      --mdc-theme-primary: navy;
+      --mdc-theme-primary: #3A0CA3;
     }
 
     body {margin: 0;}
     main {margin-left: 8px;}
     
     .view {display: none;}
+      
+      #countriesAdded {
+          width:500px}  
   </style>
 
   </head>
@@ -50,9 +54,9 @@
      <div class="view" id="one">
          <h1>Select Countries</h1>
          <p>Find countries by typing and then add them to the list. Click chart once satisfied with the list</p>
-         <input id="countryInput" list="countries">
+         <input id="statesInput" list="states">
 
-         <datalist id="countries">
+         <datalist id="states">
          </datalist>
          <button class="mdc-button foo-button mdc-button--raised">
              <div class="mdc-button__ripple"></div>
@@ -97,6 +101,8 @@
 
     <script>
         
+        
+        
         //init material componenents
         mdc.ripple.MDCRipple.attachTo(document.querySelector('.foo-button'));
         mdc.ripple.MDCRipple.attachTo(document.querySelector('.bar-button'));
@@ -104,131 +110,163 @@
         mdc.dataTable.MDCDataTable.attachTo(document.querySelector('.mdc-data-table'));  
         
         //grab some nodes that will be used later
-        let countryInput = document.querySelector('#countryInput');
+        let statesInput = document.querySelector('#statesInput');
         let inputList = document.querySelector('#countriesAdded'); 
-        let countryDataList = document.querySelector('#countries');
+        let stateDataList = document.querySelector('#states');
         let tableHeader = document.querySelector('.mdc-data-table__header-row');
         let tableContent = document.querySelector('.mdc-data-table__content');
         
         //init global variables
-        let countryArray = [];  
+        let statesArray = [];  
         let fetchedData = null;
 
+        //add state abreviations to list choices
+        statesAbr.forEach( (key) => {
+            let listOption = document.createElement('option');
+            listOption.value = ''+key;
 
-        //add countries to countryArray when add button is clicked  
+            stateDataList.appendChild(listOption);                  
+         });        
+        
+        
+        //add countries to statesArray when add button is clicked  
         document.querySelector('.foo-button').addEventListener('click', event => {
             
             //first check if there is a value
-            if(countryInput.value != ''){
-                //add to list
-                let listItem = document.createElement('li');
-                listItem.classList.add('mdc-list-item');
-                mdc.ripple.MDCRipple.attachTo(listItem);
-                
-                let textItem = document.createElement('span');
-                textItem.classList.add('mdc-list-item__text');
-                textItem.appendChild(document.createTextNode(countryInput.value));
+            if(statesInput.value != ''){
+                //make sure state is not already in array
+                if(!statesArray.includes(statesInput.value)){
 
-                listItem.appendChild(textItem);
-                inputList.appendChild(listItem);
-                
-                //keep track of countries
-                countryArray.push(countryInput.value);
+                    //create delete button
+                    let delButton = document.createElement('button');
+                    delButton.classList.add('mdc-button','bar-button','mdc-button--raised');
+                    mdc.ripple.MDCRipple.attachTo(delButton);
+                    let delButtonDiv = document.createElement('div');
+                    delButtonDiv.classList.add('mdc-button__ripple');
+                    delButton.appendChild(delButtonDiv);
+                    let delButtonSpan = document.createElement('span');
+                    delButtonSpan.classList.add('mdc-button__label');
+                    delButtonSpan.textContent = "Delete";
+                    delButton.appendChild(delButtonSpan);
+                    
+                    //create list item
+                    let listItem = document.createElement('li');
+                    listItem.classList.add('mdc-list-item');
+                    listItem.style.justifyContent = "space-between";
+                    mdc.ripple.MDCRipple.attachTo(listItem);
+                    
+                    //create text item
+                    let textItem = document.createElement('span');
+                    textItem.classList.add('mdc-list-item__text');
+                    textItem.appendChild(document.createTextNode(statesInput.value));
+                    
+                    //add to list
+                    listItem.appendChild(textItem);
+                    listItem.appendChild(delButton);
+                    inputList.appendChild(listItem);
+                    
+                    //add functionality to delete button
+                    delButton.addEventListener("click", function(){
+                        listItem.remove();
+                        statesArray.splice(statesArray.indexOf(textItem.textContent),1);
+                    });
+                    
+                    //keep track of states
+                    statesArray.push(statesInput.value);
+                }
             }
             
             //make input blank
-            countryInput.value = '';
+            statesInput.value = '';
         });
-
-
-        //functionality when chart button is clicked
-        document.querySelector('.bar-button').addEventListener('click', event => {
-            //used to store data for chart
-            let pieChartVals = [];
-            
-            //first check if countries were added
-            if(countryArray.length > 0){
-                
-                //create table rows with data ----------------------
-                let tr = document.createElement('tr');
-                tr.classList.add('mmdc-data-table__row');
-
-
-                fetchedData[countryArray[0]].forEach( (date) => {
-                    let td = document.createElement('td');
-                    td.classList.add('mdc-data-table__cell');
-                    td.appendChild(document.createTextNode(date));
-
-                })
-                
-                tableContent.appendChild
-                //---------------------------------------------------
-                
-                //add headers to graph data
-                pieChartVals.push(['Country', 'Total']);
-                
-                //variable used to find length of each array
-                let numValues = fetchedData[countryArray[0]].length;
-                
-                //loop through every country selected
-                countryArray.forEach( (country) => {
-                    
-                    //create and add table header for each country
-                    let header = document.createElement('th');
-                    header.classList.add('mdc-data-table__header-cell');
-                    header.appendChild(document.createTextNode(country));
-                    tableHeader.appendChild(header);
-                    
-                    //store data used for graph for each country
-                    let temp = [];
-                    temp.push(country);
-                    temp.push(fetchedData[country][numValues-1]["deaths"]);
-                    pieChartVals.push(temp);
-                });
-
-
-                //for loop to add data for table in descending date order
-                for(let i=numValues-1; i > -1; i--){
-                    let tr = document.createElement('tr');
-                    tr.classList.add('mmdc-data-table__row');
-
-                    let td = document.createElement('td');
-                    td.classList.add('mdc-data-table__cell');
-                    td.appendChild(document.createTextNode(fetchedData[countryArray[0]][i].date));
-
-                    tr.appendChild(td);
-
-                    countryArray.forEach( (country) => {
-                        let td2 = document.createElement('td');
-                        td2.classList.add('mdc-data-table__cell');
-                        td2.appendChild(document.createTextNode(fetchedData[country][i].deaths));
-                        tr.appendChild(td2);
-                    });
-                    tableContent.appendChild(tr);
-                }
-            }//end of if
-
-            //draw pie chart and switch views
-            drawChart(pieChartVals);
-            hideViews();
-            document.querySelector('#two').style.display = "block";
-
-        });
-
 
         
-        //fetch request of all data + population of datalist
-        fetch("https://pomber.github.io/covid19/timeseries.json")
+        
+        //functionality when chart button is clicked
+        document.querySelector('.bar-button').addEventListener('click', event => {
+          let state = statesArray[0];
+          let url = "https://covidtracking.com/api/v1/states/" + state + "/daily.json"
+          fetch(url)
           .then(response => response.json())
           .then(data => {
-            Object.keys(data).forEach( (key) => {
-                    let listOption = document.createElement('option');
-                    listOption.value = ''+key;
-
-                    countryDataList.appendChild(listOption);                  
-            });
+            console.log(data);
             fetchedData = data;
           });  
+            
+//             //used to store data for chart
+//             let pieChartVals = [];
+            
+//             //first check if countries were added
+//             if(statesArray.length > 0){
+                
+//                 //create table rows with data ----------------------
+//                 let tr = document.createElement('tr');
+//                 tr.classList.add('mmdc-data-table__row');
+
+
+//                 fetchedData[statesArray[0]].forEach( (date) => {
+//                     let td = document.createElement('td');
+//                     td.classList.add('mdc-data-table__cell');
+//                     td.appendChild(document.createTextNode(date));
+
+//                 })
+                
+//                 tableContent.appendChild
+//                 //---------------------------------------------------
+                
+//                 //add headers to graph data
+//                 pieChartVals.push(['Country', 'Total']);
+                
+//                 //variable used to find length of each array
+//                 let numValues = fetchedData[statesArray[0]].length;
+                
+//                 //loop through every country selected
+//                 statesArray.forEach( (country) => {
+                    
+//                     //create and add table header for each country
+//                     let header = document.createElement('th');
+//                     header.classList.add('mdc-data-table__header-cell');
+//                     header.appendChild(document.createTextNode(country));
+//                     tableHeader.appendChild(header);
+                    
+//                     //store data used for graph for each country
+//                     let temp = [];
+//                     temp.push(country);
+//                     temp.push(fetchedData[country][numValues-1]["deaths"]);
+//                     pieChartVals.push(temp);
+//                 });
+
+
+//                 //for loop to add data for table in descending date order
+//                 for(let i=numValues-1; i > -1; i--){
+//                     let tr = document.createElement('tr');
+//                     tr.classList.add('mmdc-data-table__row');
+
+//                     let td = document.createElement('td');
+//                     td.classList.add('mdc-data-table__cell');
+//                     td.appendChild(document.createTextNode(fetchedData[statesArray[0]][i].date));
+
+//                     tr.appendChild(td);
+
+//                     statesArray.forEach( (country) => {
+//                         let td2 = document.createElement('td');
+//                         td2.classList.add('mdc-data-table__cell');
+//                         td2.appendChild(document.createTextNode(fetchedData[country][i].deaths));
+//                         tr.appendChild(td2);
+//                     });
+//                     tableContent.appendChild(tr);
+//                 }
+//             }//end of if
+
+//             //draw pie chart and switch views
+//             drawChart(pieChartVals);
+//             hideViews();
+//             document.querySelector('#two').style.display = "block";
+
+        });
+
+
+       
 
 
 
