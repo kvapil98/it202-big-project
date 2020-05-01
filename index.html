@@ -74,7 +74,7 @@
 
          <button class="mdc-button bar-button mdc-button--raised">
              <div class="mdc-button__ripple"></div>
-             <span class="mdc-button__label">Chart</span>
+             <span class="mdc-button__label">Get Info</span>
          </button>
 
          <ul class="mdc-list" id="countriesAdded">
@@ -85,8 +85,11 @@
 
 
      <div class="view" id="two">
-         <h1>Table</h1>
-         <h3>Number of Deaths</h3>
+         <h1>State Information</h1>
+         <div id="state-container">
+             
+         </div>
+<!--          <h3>Number of Deaths</h3>
          <div class="mdc-data-table">
           <table class="mdc-data-table__table" aria-label="Dessert calories">
             <thead>
@@ -97,18 +100,14 @@
             <tbody class="mdc-data-table__content">
             </tbody>
           </table>
-        </div>
+        </div> -->
      </div>
 
 
      <div class="view" id="three">
-         <h1>Location</h1>
+         <h1>Geolocation Information</h1>
          
          <div class="mdc-card demo-card demo-basic-with-header">
-<!--           <div class="demo-card__primary">
-            <h1 class="demo-card__title mdc-typography mdc-typography--headline6">Current Weather</h1>
-            <h2 class="demo-card__subtitle mdc-typography mdc-typography--subtitle2">37&#0176</h2>
-          </div> -->
           <div class="mdc-card__primary-action demo-card__primary-action" tabindex="0">
             <div class="mdc-card__media mdc-card__media--16-9 demo-card__media" style="background-image: url(&quot;https://www.alabamawx.com/wp-content/uploads/2017/03/shutterstock_240459751-600x400.jpg&quot;);">
               <div class="mdc-card__media-content demo-card__media-content">
@@ -120,11 +119,33 @@
             </div>
             <div class="demo-card__secondary mdc-typography mdc-typography--body2">
                 <h1>Details</h1>
-                <h3 id="currFeelsLike">Feels like: 60&#0176</h3>
-                <h3 id="currTempHigh">Temp High: 60&#0176</h3>
-                <h3 id="currTempLow">Temp Low: 55&#0176</h3>
-                <h3 id="currHumidity">Humidity: 47%</h3>
-                <h3 id="currWind">Wind Speed: 14mph</h3>
+                <h3 id="currFeelsLike"></h3>
+                <h3 id="currTempHigh"></h3>
+                <h3 id="currTempLow"></h3>
+                <h3 id="currHumidity"></h3>
+                <h3 id="currWind"></h3>
+
+            </div>
+          </div>
+        </div>
+         
+                  <div class="mdc-card demo-card demo-basic-with-header">
+          <div class="mdc-card__primary-action demo-card__primary-action" tabindex="0">
+            <div class="mdc-card__media mdc-card__media--16-9 demo-card__media" style="background-image: url(&quot;https://www.alabamawx.com/wp-content/uploads/2017/03/shutterstock_240459751-600x400.jpg&quot;);">
+              <div class="mdc-card__media-content demo-card__media-content">
+                <div class="demo-card__primary">
+                  <h1 class="demo-card__title mdc-typography mdc-typography--headline6" style="font-size: 26px;font-style: italic;">Current Weather</h1>
+                  <h1 class="demo-card__subtitle mdc-typography mdc-typography--subtitle2" id="currTemp" style="font-size: xxx-large;"></h1>
+                </div>
+              </div>
+            </div>
+            <div class="demo-card__secondary mdc-typography mdc-typography--body2">
+                <h1>Details</h1>
+                <h3 id="currFeelsLike"></h3>
+                <h3 id="currTempHigh"></h3>
+                <h3 id="currTempLow"></h3>
+                <h3 id="currHumidity"></h3>
+                <h3 id="currWind"></h3>
 
             </div>
           </div>
@@ -142,14 +163,15 @@
         mdc.ripple.MDCRipple.attachTo(document.querySelector('.foo-button'));
         mdc.ripple.MDCRipple.attachTo(document.querySelector('.bar-button'));
         mdc.topAppBar.MDCTopAppBar.attachTo(document.querySelector('header.mdc-top-app-bar'));
-        mdc.dataTable.MDCDataTable.attachTo(document.querySelector('.mdc-data-table'));  
+        //mdc.dataTable.MDCDataTable.attachTo(document.querySelector('.mdc-data-table'));  
         
         //grab some nodes that will be used later
         let statesInput = document.querySelector('#statesInput');
         let inputList = document.querySelector('#countriesAdded'); 
         let stateDataList = document.querySelector('#states');
-        let tableHeader = document.querySelector('.mdc-data-table__header-row');
-        let tableContent = document.querySelector('.mdc-data-table__content');
+        //let tableHeader = document.querySelector('.mdc-data-table__header-row');
+        //let tableContent = document.querySelector('.mdc-data-table__content');
+        let stateContain = document.querySelector('#state-container'); 
         
         //weather DOM components
         let currTemp = document.querySelector('#currTemp');
@@ -162,6 +184,7 @@
         //init global variables
         let statesArray = [];  
         let fetchedData = null;
+        let clickedInfo = false;
 
         //add state abreviations to list choices
         statesAbr.forEach( (key) => {
@@ -235,14 +258,67 @@
         
         //functionality when chart button is clicked
         document.querySelector('.bar-button').addEventListener('click', event => {
-          let state = statesArray[0];
-          let url = "https://covidtracking.com/api/v1/states/" + state + "/daily.json"
-          fetch(url)
-          .then(response => response.json())
-          .then(data => {
-            console.log(data);
-            fetchedData = data;
-          });  
+//             let state = statesArray[0];
+//             let url = "https://covidtracking.com/api/v1/states/" + state + "/daily.json"
+//             fetch(url)
+//             .then(response => response.json())
+//             .then(data => {
+//                 console.log(data);
+//                 fetchedData = data;
+//             });
+            
+            if(clickedInfo){
+                document.querySelectorAll('.stateInfoCard').forEach((card) => {card.remove()});
+            }
+            
+            
+            statesArray.forEach((state) => {
+                let card = document.createElement('div');
+                card.classList.add('mdc-card', 'demo-card', 'stateInfoCard');
+           
+                
+                let abr = document.createElement('h1');
+                abr.textContent = state;
+                
+                let overallTitle = document.createElement('h2');
+                overallTitle.textContent = "Overall";
+                
+                let hospitalTitle = document.createElement('h2');
+                hospitalTitle.textContent = "Hospitalized";
+                
+                let positive = document.createElement('h3');
+                let negative = document.createElement('h3');
+                let hosCurr = document.createElement('h3');
+                let hosCum = document.createElement('h3');
+                let url = "https://covidtracking.com/api/v1/states/" + state + "/daily.json"
+                fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    positive.textContent = "Confirmed Cases: " + data[0].positive;
+                    negative.textContent = "Total Deaths: " + data[0].death;
+                    hosCurr.textContent = "Currently: " + data[0].hospitalizedCurrently;
+                    hosCum.textContent = "Cumulative: " + data[0].hospitalizedCumulative;
+                    //fetchedData = data;
+                });
+                
+                card.appendChild(abr);
+                card.appendChild(overallTitle);
+                card.appendChild(positive);
+                card.appendChild(negative);
+                card.appendChild(hospitalTitle);
+                card.appendChild(hosCurr);
+                card.appendChild(hosCum);
+                
+                
+                stateContain.appendChild(card);
+                
+                
+            });
+            
+            
+            
+            
             
 //             //used to store data for chart
 //             let pieChartVals = [];
@@ -311,8 +387,9 @@
 
 //             //draw pie chart and switch views
 //             drawChart(pieChartVals);
-//             hideViews();
-//             document.querySelector('#two').style.display = "block";
+             hideViews();
+             clickedInfo = true;
+             document.querySelector('#two').style.display = "block";
 
         });
 
