@@ -7,7 +7,15 @@
   <link href="https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.css" rel="stylesheet">
   <script src="https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.js"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  
+      
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/manifest.json">
+      
+      
+      <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
       <script type="text/javascript" src="states.js"></script>
   <style>
     :root {
@@ -206,22 +214,23 @@
 //             //fetchedData = data;
 //           });  
         
-        
+        //add the graph functionality to the graph icon
         graphButton.addEventListener('click', event => {
             let grData = new google.visualization.DataTable();
             let grVals = [];
             let check
             grData.addColumn('string', 'Date');
-            statesArray.forEach((state) => {
-                    grData.addColumn('number', state);
-            });            
             
-            
+            let addColumn = true;
             for(let i=6; i>-1; i--){
                 let temp = [];
                 let checkCount = true;
                 fetchedData.forEach((state) => {
                     if(statesArray.includes(state[0].state)){
+                        if(addColumn){
+                            grData.addColumn('number', state[0].state);
+                        };
+                        
                         if(checkCount){
                           let dateVal = state[i].dateChecked.split("T");
                           temp.push(dateVal[0]);  
@@ -230,7 +239,7 @@
                         temp.push(state[i].positive);
                     }
                 });
-
+                addColumn = false;
                 console.log(temp);
                 grVals.push(temp);
             }
@@ -298,18 +307,6 @@
         
         //functionality when chart button is clicked
         document.querySelector('.bar-button').addEventListener('click', event => {
-//             let state = statesArray[0];
-//             let url = "https://covidtracking.com/api/v1/states/" + state + "/daily.json"
-//             fetch(url)
-//             .then(response => response.json())
-//             .then(data => {
-//                 console.log(data);
-//                 fetchedData = data;
-//             });
-            
-//             let grData = new google.visualization.DataTable();
-//             let grVals = [];
-//             grData.addColumn('string', 'Date');
             
             if(clickedInfo){
                 document.querySelectorAll('.stateInfoCard').forEach((card) => {card.remove()});
@@ -336,7 +333,6 @@
                 let hosCurr = document.createElement('h3');
                 let hosCum = document.createElement('h3');
                 let url = "https://covidtracking.com/api/v1/states/" + state + "/daily.json"
-//                 grData.addColumn('number', state);
                 
                 fetch(url)
                 .then(response => response.json())

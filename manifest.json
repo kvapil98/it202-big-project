@@ -1,0 +1,22 @@
+{
+  "short_name": "Covid-19 App",
+  "name": "Big Project",
+  "description": "Weather forecast information",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "https://jumbo-river.codio.io/",
+  "background_color": "#3a0ca3",
+  "display": "fullscreen",
+  "scope": "/",
+  "theme_color": "#4361ee"
+}
