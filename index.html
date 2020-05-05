@@ -7,7 +7,7 @@
   <link href="https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.css" rel="stylesheet">
   <script src="https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.js"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  
+  <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
       
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -54,7 +54,8 @@
           <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button topBarButton" value="one" aria-label="Search">search</button>
           <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button topBarButton" value="two" aria-label="Table">table_chart</button>
           <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button topBarButton" value="three" aria-label="Chart">location_on</button>
-            <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button topBarButton" id="graphFour" value="four" aria-label="Chart">show_chart</button>
+          <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button topBarButton" id="graphFour" value="four" aria-label="Chart">show_chart</button>
+          <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button topBarButton" id="histFive" value="five" aria-label="Chart">history</button>
         </section>
       </div>
     </header>
@@ -98,18 +99,7 @@
          <div id="state-container">
              
          </div>
-<!--          <h3>Number of Deaths</h3>
-         <div class="mdc-data-table">
-          <table class="mdc-data-table__table" aria-label="Dessert calories">
-            <thead>
-              <tr class="mdc-data-table__header-row">
-                <th class="mdc-data-table__header-cell">Date</th>
-              </tr>
-            </thead>
-            <tbody class="mdc-data-table__content">
-            </tbody>
-          </table>
-        </div> -->
+
      </div>
 
 
@@ -161,6 +151,10 @@
         </div> -->
       </div>
         
+      <div class="view" id="five">
+         <h1>History</h1>
+      </div>
+        
     </main>
 
 
@@ -182,6 +176,7 @@
         //let tableContent = document.querySelector('.mdc-data-table__content');
         let stateContain = document.querySelector('#state-container');
         let graphButton = document.querySelector('#graphFour');
+        let historyButton = document.querySelector('#histFive');
         
         //weather DOM components
         let currTemp = document.querySelector('#currTemp');
@@ -196,7 +191,15 @@
         let statesArray = [];  
         let fetchedData = [];
         let clickedInfo = false;
+        
+        //set up database
+        const db = new Dexie('MyDatabase');
+        db.version(1).stores({
+              history: '++id,date,states,data'
+          });
 
+
+        
         //add state abreviations to list choices
         statesAbr.forEach( (key) => {
             let listOption = document.createElement('option');
@@ -205,6 +208,14 @@
             stateDataList.appendChild(listOption);                  
          });        
         
+        historyButton.addEventListener('click', event => {
+            db.history.toArray()
+            .then(arr => {
+                for(let d of arr){
+                    console.log(d.date);
+                }
+            });
+        });
 
 //         let url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=42.1928236,-88.21689320000002&key=AIzaSyBGigYPYNDYIjMBPJowjOEAebOqmx-9aWM"
 //           fetch(url)
@@ -216,36 +227,38 @@
         
         //add the graph functionality to the graph icon
         graphButton.addEventListener('click', event => {
-            let grData = new google.visualization.DataTable();
-            let grVals = [];
-            let check
-            grData.addColumn('string', 'Date');
-            
-            let addColumn = true;
-            for(let i=6; i>-1; i--){
-                let temp = [];
-                let checkCount = true;
-                fetchedData.forEach((state) => {
-                    if(statesArray.includes(state[0].state)){
-                        if(addColumn){
-                            grData.addColumn('number', state[0].state);
-                        };
-                        
-                        if(checkCount){
-                          let dateVal = state[i].dateChecked.split("T");
-                          temp.push(dateVal[0]);  
-                          checkCount = false;
-                        };
-                        temp.push(state[i].positive);
-                    }
-                });
-                addColumn = false;
-                console.log(temp);
-                grVals.push(temp);
+            if(fetchedData.length > 0){
+                let grData = new google.visualization.DataTable();
+                let grVals = [];
+                let check
+                grData.addColumn('string', 'Date');
+
+                let addColumn = true;
+                for(let i=6; i>-1; i--){
+                    let temp = [];
+                    let checkCount = true;
+                    fetchedData.forEach((state) => {
+                        if(statesArray.includes(state[0].state)){
+                            if(addColumn){
+                                grData.addColumn('number', state[0].state);
+                            };
+
+                            if(checkCount){
+                              let dateVal = state[i].dateChecked.split("T");
+                              temp.push(dateVal[0]);  
+                              checkCount = false;
+                            };
+                            temp.push(state[i].positive);
+                        }
+                    });
+                    addColumn = false;
+                    console.log(temp);
+                    grVals.push(temp);
+                }
+                console.log(fetchedData);
+                grData.addRows(grVals);
+                drawBasic(grData);
             }
-            
-            grData.addRows(grVals);
-            drawBasic(grData);
         });
         
         
@@ -301,20 +314,10 @@
         });
 
         
-        
-        
-        
-        
-        //functionality when chart button is clicked
-        document.querySelector('.bar-button').addEventListener('click', event => {
-            
-            if(clickedInfo){
-                document.querySelectorAll('.stateInfoCard').forEach((card) => {card.remove()});
-            }
+        // async to wait for fetch
+        let apiCallAndUpdate = async () => {
             fetchedData.length = 0;
-            
-            
-            statesArray.forEach((state) => {
+            for(let state of statesArray){
                 let card = document.createElement('div');
                 card.classList.add('mdc-card', 'demo-card', 'stateInfoCard');
            
@@ -334,7 +337,7 @@
                 let hosCum = document.createElement('h3');
                 let url = "https://covidtracking.com/api/v1/states/" + state + "/daily.json"
                 
-                fetch(url)
+                await fetch(url)
                 .then(response => response.json())
                 .then(data => {
                     //console.log(data);
@@ -342,8 +345,10 @@
                     negative.textContent = "Total Deaths: " + data[0].death;
                     hosCurr.textContent = "Currently: " + data[0].hospitalizedCurrently;
                     hosCum.textContent = "Cumulative: " + data[0].hospitalizedCumulative;
-                    fetchedData.push(data);
+                    fetchedData.push(data.slice(0,7));
+                    //console.log(fetchedData);
                 });
+                
                 
                 card.appendChild(abr);
                 card.appendChild(overallTitle);
@@ -357,13 +362,99 @@
                 stateContain.appendChild(card);
                 
                 
+            
+            }
+            
+        }        
+        
+
+        
+        //functionality when get info button is clicked
+        document.querySelector('.bar-button').addEventListener('click', event => {
+            
+            if(clickedInfo){
+                document.querySelectorAll('.stateInfoCard').forEach((card) => {card.remove()});
+            }
+//             fetchedData.length = 0;
+            
+            //addHistory();
+//             console.log(apiCallAndUpdate());
+            apiCallAndUpdate()
+            .then(junk => {
+                
+                let today = new Date();
+                let date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+                let time = today.getHours() + ":" + today.getMinutes();
+                let dateTime = date+' '+time;
+                
+                let dataStore = {};
+                
+                dataStore["date"] = dateTime;
+                dataStore["states"] = statesArray;
+                dataStore["data"] = fetchedData;
+                
+                console.log("hello");
+                console.log(fetchedData);
+                
+                db.history.put(dataStore);
+                
             });
+            
+//             statesArray.forEach((state) => {
+//                 let card = document.createElement('div');
+//                 card.classList.add('mdc-card', 'demo-card', 'stateInfoCard');
+           
+                
+//                 let abr = document.createElement('h1');
+//                 abr.textContent = state;
+                
+//                 let overallTitle = document.createElement('h2');
+//                 overallTitle.textContent = "Overall";
+                
+//                 let hospitalTitle = document.createElement('h2');
+//                 hospitalTitle.textContent = "Hospitalized";
+                
+//                 let positive = document.createElement('h3');
+//                 let negative = document.createElement('h3');
+//                 let hosCurr = document.createElement('h3');
+//                 let hosCum = document.createElement('h3');
+//                 let url = "https://covidtracking.com/api/v1/states/" + state + "/daily.json"
+                
+//                 fetch(url)
+//                 .then(response => response.json())
+//                 .then(data => {
+//                     //console.log(data);
+//                     positive.textContent = "Confirmed Cases: " + data[0].positive;
+//                     negative.textContent = "Total Deaths: " + data[0].death;
+//                     hosCurr.textContent = "Currently: " + data[0].hospitalizedCurrently;
+//                     hosCum.textContent = "Cumulative: " + data[0].hospitalizedCumulative;
+//                     fetchedData.push(data.slice(0,7));
+//                     //console.log(fetchedData);
+//                 });
+                
+//                 card.appendChild(abr);
+//                 card.appendChild(overallTitle);
+//                 card.appendChild(positive);
+//                 card.appendChild(negative);
+//                 card.appendChild(hospitalTitle);
+//                 card.appendChild(hosCurr);
+//                 card.appendChild(hosCum);
+                
+                
+//                 stateContain.appendChild(card);
+                
+                
+//             });
+            
+             
             
              hideViews();
              clickedInfo = true;
              document.querySelector('#two').style.display = "block";
 
         });
+        
+        
 
 
        
