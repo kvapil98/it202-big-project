@@ -4,17 +4,17 @@
   "description": "Current Covid-19 Tracker",
   "icons": [
     {
-      "src": "./it202-big-project/img/android-chrome-192x192.png",
+      "src": "./img/android-chrome-192x192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "./it202-big-project/img/android-chrome-512x512.png",
+      "src": "./img/android-chrome-512x512.png",
       "type": "image/png",
       "sizes": "512x512"
     }
   ],
-  "start_url": "https://kvapil98.github.io",
+  "start_url": "index.html",
   "background_color": "#3a0ca3",
   "display": "fullscreen",
   "scope": "/",
