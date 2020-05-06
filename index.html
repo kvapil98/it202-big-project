@@ -12,11 +12,11 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="./img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="./img/favicon-16x16.png">
-    <link rel="manifest" href=".it202-big-project/manifest.json">
+    <link rel="manifest" href="./it202-big-project/manifest.json">
       
       
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript" src=".it202-big-project/js/states.js"></script>
+    <script type="text/javascript" src="./it202-big-project/js/states.js"></script>
     
       <style>
         :root {--mdc-theme-primary: #3A0CA3;}
@@ -98,7 +98,7 @@
             <h1>Geolocation Information</h1>
             <div class="mdc-card demo-card demo-basic-with-header">
              <div class="mdc-card__primary-action demo-card__primary-action" tabindex="0">
-               <div class="mdc-card__media mdc-card__media--16-9 demo-card__media" style="background-image: url(&quot;.it202-big-project/img/shutterstock_240459751-600x400.jpg&quot;);">
+               <div class="mdc-card__media mdc-card__media--16-9 demo-card__media" style="background-image: url(&quot;./it202-big-project/img/shutterstock_240459751-600x400.jpg&quot;);">
                  <div class="mdc-card__media-content demo-card__media-content">
                    <div class="demo-card__primary">
                      <h1 class="demo-card__title mdc-typography mdc-typography--headline6" style="font-size: 26px;font-style: italic;">Current Weather</h1>
@@ -145,11 +145,11 @@
 
 
     <script>
-        
+        console.log("updated version 1");
         //register service worker
         if ('serviceWorker' in navigator) {
           window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js').then((registration) => {
+            navigator.serviceWorker.register('./it202-big-project/sw.js').then((registration) => {
               // Registration was successful
               console.log('ServiceWorker registration successful with scope: ', registration.scope);
             }, (err) => {

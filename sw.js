@@ -1,11 +1,11 @@
 let CACHE_NAME = 'big-project-cache';
 let urlsToCache = [
-  './',
-  '.it202-big-project/manifest.json',  
-  '.it202-big-project/js/states.js',
-  '.it202-big-project/img/shutterstock_240459751-600x400.jpg',
-  '.it202-big-project/img/favicon-32x32.png',
-  '.it202-big-project/img/android-chrome-192x192.png', 
+  './it202-big-project',
+  './it202-big-project/manifest.json',  
+  './it202-big-project/js/states.js',
+  './it202-big-project/img/shutterstock_240459751-600x400.jpg',
+  './it202-big-project/img/favicon-32x32.png',
+  './it202-big-project/img/android-chrome-192x192.png', 
   'https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.css',
   'https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.js',
 ];
