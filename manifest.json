@@ -1,15 +1,15 @@
 {
-  "short_name": "Covid-19 App",
-  "name": "Big Project",
-  "description": "Weather forecast information",
+  "short_name": "Covid-19",
+  "name": "Covid-19 Tracker",
+  "description": "Current Covid-19 Tracker",
   "icons": [
     {
-      "src": "/android-chrome-192x192.png",
+      "src": "./img/android-chrome-192x192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "/android-chrome-512x512.png",
+      "src": "./img/android-chrome-512x512.png",
       "type": "image/png",
       "sizes": "512x512"
     }
