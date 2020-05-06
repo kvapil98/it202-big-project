@@ -98,7 +98,7 @@
             <h1>Geolocation Information</h1>
             <div class="mdc-card demo-card demo-basic-with-header">
              <div class="mdc-card__primary-action demo-card__primary-action" tabindex="0">
-               <div class="mdc-card__media mdc-card__media--16-9 demo-card__media" style="background-image: url(&quot;https://www.alabamawx.com/wp-content/uploads/2017/03/shutterstock_240459751-600x400.jpg&quot;);">
+               <div class="mdc-card__media mdc-card__media--16-9 demo-card__media" style="background-image: url(&quot;./img/shutterstock_240459751-600x400.jpg&quot;);">
                  <div class="mdc-card__media-content demo-card__media-content">
                    <div class="demo-card__primary">
                      <h1 class="demo-card__title mdc-typography mdc-typography--headline6" style="font-size: 26px;font-style: italic;">Current Weather</h1>
@@ -146,7 +146,18 @@
 
     <script>
         
-        
+        //register service worker
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').then((registration) => {
+              // Registration was successful
+              console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            }, (err) => {
+              // registration failed
+              console.log('ServiceWorker registration failed: ', err);
+            });
+          });
+        }
         
         //init material componenents
         mdc.ripple.MDCRipple.attachTo(document.querySelector('.foo-button'));
@@ -259,7 +270,7 @@
                         tbody.appendChild(tr);
                         
                         //populate values with history values
-                        useInfoButton.addEventListener("click", function(){
+                        useInfoButton.addEventListener("click", () => {
                             //statesArray = arr[d].states;
                             statesArray.length = 0;
                             fetchedData = arr[d].data;
@@ -296,9 +307,9 @@
 //             //fetchedData = data;
 //           });  
         
-        
-        //add the graph functionality to the graph icon
-        graphButton.addEventListener('click', event => {
+
+        //create google graph function
+        let createGraph = () => {
             //make sure there is data to be graphed
             if(fetchedData.length > 0){
                 //set up graph variables
@@ -335,10 +346,10 @@
                 
                 //draw graph
                 grData.addRows(grVals);
+                //console.log("drawing...");  
                 drawBasic(grData);
-            }
-        });
-        
+            }            
+        }
         
         //add countries to statesArray when add button is clicked  
         document.querySelector('.foo-button').addEventListener('click', event => {
@@ -377,7 +388,7 @@
                     inputList.appendChild(listItem);
                     
                     //add functionality to delete button
-                    delButton.addEventListener("click", function(){
+                    delButton.addEventListener("click", () => {
                         listItem.remove();
                         statesArray.splice(statesArray.indexOf(textItem.textContent),1);
                     });
@@ -455,6 +466,10 @@
                 .then(response => response.json())
                 .then(data => {
                     fetchedData.push(data.slice(0,7));
+                })
+                .catch((error) => {
+                   console.error('Error', error);
+                   alert("Unable to call Covid API");
                 });
                 createCards(counter);
                 counter++;  
@@ -468,42 +483,47 @@
         //functionality when get info button is clicked
         document.querySelector('.bar-button').addEventListener('click', event => {
             
-            //make sure there is data to process
-            if(statesArray.length > 0){
-                
-                //check for previous cards
-                if(clickedInfo){
-                    document.querySelectorAll('.stateInfoCard').forEach((card) => {card.remove()});
+            if(window.navigator.onLine){
+                //make sure there is data to process
+                if(statesArray.length > 0){
+
+                    //check for previous cards
+                    if(clickedInfo){
+                        document.querySelectorAll('.stateInfoCard').forEach((card) => {card.remove()});
+                    }
+
+                    //call api and then store data in database
+                    apiCallAndUpdate()
+                    .then(junk => {
+
+                        //date and time of access
+                        let today = new Date();
+                        let date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+                        let time = today.getHours() + ":" + today.getMinutes();
+                        let dateTime = date+', '+time;
+
+                        //db object
+                        let dataStore = {};
+
+                        //store in database
+                        dataStore["date"] = dateTime;
+                        dataStore["states"] = statesArray;
+                        dataStore["data"] = fetchedData;
+
+                        db.history.put(dataStore);
+
+                    });
+
+
+                     //shift to state info screen
+                     hideViews();
+                     clickedInfo = true;
+                     document.querySelector('#two').style.display = "block";
                 }
-
-                //call api and then store data in database
-                apiCallAndUpdate()
-                .then(junk => {
-                    
-                    //date and time of access
-                    let today = new Date();
-                    let date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-                    let time = today.getHours() + ":" + today.getMinutes();
-                    let dateTime = date+', '+time;
-                    
-                    //db object
-                    let dataStore = {};
-                    
-                    //store in database
-                    dataStore["date"] = dateTime;
-                    dataStore["states"] = statesArray;
-                    dataStore["data"] = fetchedData;
-                    
-                    db.history.put(dataStore);
-
-                });
-
-
-                 //shift to state info screen
-                 hideViews();
-                 clickedInfo = true;
-                 document.querySelector('#two').style.display = "block";
+            }else{
+                alert("Must be online to get new data. In offline, use history data");
             }
+            
         });
         
         
@@ -528,10 +548,19 @@
                  
                  //geolocation routine
                  if(val == "three"){
-                     getGeolocationInfo();
+                     if(window.navigator.onLine){
+                         getGeolocationInfo();
+                     }else{
+                         alert("Cannot call weather API in offline");
+                     }
                  }  
-                   
+                 
+                 //console.log("showing...");  
                  document.querySelector("#"+val).style.display="block";
+                   
+                 if(val == "four"){
+                     createGraph();
+                 }
                })
           });
 
@@ -559,7 +588,11 @@
                     currTempLow.textContent = "Temp Low: " + data.main["temp_min"] + String.fromCharCode(176);
                     currHumidity.textContent = "Humidity: "+data.main.humidity + "%";
                     currWind.textContent = "Wind Speed: "+data.wind.speed + "mph";
-                  });  
+                  })
+                .catch((error) => {
+                   console.error('Error', error);
+                   alert("Unable to call Weather API");
+                });
                 
             }
           
@@ -573,22 +606,23 @@
 
             let drawBasic = (addedData) => {
 
-              var options = {
+              let options = {
+                title: 'Confirmed Cases The Past Seven Days',
                 hAxis: {
-                  title: 'Time',
+                  title: 'Date',
                   slantedText:true, 
                   slantedTextAngle:30,
                   format: 'M/d/yy',
                   gridlines: {count: 15}
                 },
                 vAxis: {
-                  title: 'Popularity'
+                  title: 'Confirmed Cases'
                 },
                 width: 900,
-                height: 500
+                height: 600
               };
 
-              var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+              let chart = new google.visualization.LineChart(document.getElementById('chart_div'));
 
               chart.draw(addedData, options);
             }
