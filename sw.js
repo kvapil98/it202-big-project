@@ -1,6 +1,6 @@
 let CACHE_NAME = 'big-project-cache';
 let urlsToCache = [
-  '.',
+  './',
   './manifest.json',  
   './js/states.js',
   './img/shutterstock_240459751-600x400.jpg',
@@ -8,6 +8,7 @@ let urlsToCache = [
   './img/android-chrome-192x192.png', 
   'https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.css',
   'https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.js',
+  'https://unpkg.com/dexie@latest/dist/dexie.js'
 ];
 
 
