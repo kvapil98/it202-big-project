@@ -30,10 +30,17 @@
         #countriesAdded {width:500px}  
 
         .demo-card {
-            height: 500px;
+            height: 435pxpx;
             width: 350px;
+            margin: auto;
+            margin-bottom: 10px;
+            border: 2px solid #3a0ca3
           }
-
+        
+          .centeredText {
+              text-align: center;
+          } 
+          
         .demo-card__primary-action{height: 500px;}
     </style>
   </head>
@@ -49,8 +56,8 @@
           <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button topBarButton" value="home" aria-label="Home">home</button>
           <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button topBarButton" value="one" aria-label="Search">search</button>
           <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button topBarButton" value="two" aria-label="Table">table_chart</button>
-          <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button topBarButton" value="three" aria-label="Chart">location_on</button>
           <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button topBarButton" id="graphFour" value="four" aria-label="Chart">show_chart</button>
+          <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button topBarButton" value="three" aria-label="Chart">location_on</button>  
           <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button topBarButton" id="histFive" value="five" aria-label="Chart">history</button>
         </section>
       </div>
@@ -62,14 +69,21 @@
 
         <!--  Home Screen View  -->
         <div class="" id="home">
-           <h1>Version 7</h1>
-           <p>Data source can be found at <a href="https://pomber.github.io/covid19/timeseries.json" target="_blank">https://pomber.github.io/covid19/timeseries.json</a></p>
+           <h1>Welcome to my Covid-19 State Tracking App</h1>
+            <p>Covid-19 data source can be found at <a href="https://covidtracking.com/api#states-historical-data" target="_blank">https://covidtracking.com/api#states-historical-data</a><br>
+               Weather data source can be found at <a href="https://openweathermap.org/" target="_blank">https://openweathermap.org/</a></p>
+           <h3>Brief Overview</h3>
+            <p>To start, head over to the search icon. Choose any states and add them to your list.
+            Once satisfied, click get info to find interesting details about each state. Once clicked
+            you can see your searches in the search history to use for later searches. The chart icon
+            displays the current states chosen in a line graph showing the past seven day confirmed cases.
+            Finally, the location icon is used to access your device's location to show the weather.</p>
         </div> 
         
         <!--  Data Select View  -->
         <div class="view" id="one">
             <h1>Select States</h1>
-            <p>Find countries by typing and then add them to the list. Click chart once satisfied with the list</p>
+            <p>Find states by typing and then add them to the list. Click get info once satisfied with the list.</p>
             <input id="statesInput" list="states">
 
             <datalist id="states"></datalist>
@@ -89,7 +103,7 @@
 
         <!--  State Cards Information View  -->
         <div class="view" id="two">
-           <h1>State Information</h1>
+           <h1 id="cardViewText"></h1>
            <div id="state-container"></div>
         </div>
 
@@ -108,11 +122,13 @@
                </div>
                <div class="demo-card__secondary mdc-typography mdc-typography--body2">
                  <h1>Details</h1>
-                 <h3 id="currFeelsLike"></h3>
-                 <h3 id="currTempHigh"></h3>
-                 <h3 id="currTempLow"></h3>
-                 <h3 id="currHumidity"></h3>
-                 <h3 id="currWind"></h3>
+                 <div style="padding-left: 100px">
+                     <h3 id="currFeelsLike"></h3>
+                     <h3 id="currTempHigh"></h3>
+                     <h3 id="currTempLow"></h3>
+                     <h3 id="currHumidity"></h3>
+                     <h3 id="currWind"></h3>
+                  </div>
                </div>
              </div>
            </div>
@@ -120,7 +136,7 @@
 
         <!--  Chart View  -->
         <div class="view" id="four">
-            <h1>Visual</h1>
+            <h1 id="chartViewText"></h1>
             <div id="chart_div"></div>
         </div>
          
@@ -151,7 +167,7 @@
           window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js').then((registration) => {
               // Registration was successful
-              console.log('ServiceWorker registration successful with scope: ', registration.scope);
+              //console.log('ServiceWorker registration successful with scope: ', registration.scope);
             }, (err) => {
               // registration failed
               console.log('ServiceWorker registration failed: ', err);
@@ -172,6 +188,8 @@
         let stateContain = document.querySelector('#state-container');
         let graphButton = document.querySelector('#graphFour');
         let historyButton = document.querySelector('#histFive');
+        let graphHeader = document.querySelector('#chartViewText');
+        let cardViewHeader = document.querySelector('#cardViewText');
         
         //weather DOM components
         let currTemp = document.querySelector('#currTemp');
@@ -287,6 +305,7 @@
                                 document.querySelectorAll('.mdc-list-item').forEach((item)=> item.remove());
                             }
                             
+                            cardViewHeader.textContent = "State Information";
                             hideViews();
                             clickedInfo = true;
                             document.querySelector('#two').style.display = "block";
@@ -317,6 +336,7 @@
                 let grVals = [];
                 let check
                 grData.addColumn('string', 'Date');
+                graphHeader.textContent = "Visual";
 
                 let addColumn = true;
                 for(let i=6; i>-1; i--){
@@ -348,6 +368,8 @@
                 grData.addRows(grVals);
                 //console.log("drawing...");  
                 drawBasic(grData);
+            }else{
+                graphHeader.textContent = "**Please Select States to Graph**";
             }            
         }
         
@@ -407,10 +429,11 @@
         let createCards = (index) => {
                 //create card
                 let card = document.createElement('div');
-                card.classList.add('mdc-card', 'demo-card', 'stateInfoCard');
-           
+                card.classList.add('mdc-card', 'demo-card', 'stateInfoCard', 'mdc-card--outlined');
+            
                 //create header
                 let abr = document.createElement('h1');
+                abr.style.cssText = 'background-color: #4cc9f0; margin: 0';
                 abr.textContent = fetchedData[index][0].state;
                 
                 //create subtitle
@@ -434,15 +457,24 @@
                 if(hosCurrVal){hosCurr.textContent = "Currently: " + hosCurrVal}else{hosCurr.textContent = "Currently: N/A"};
                 let hosCumVal = fetchedData[index][0].hospitalizedCumulative;
                 if(hosCumVal){hosCum.textContent = "Cumulative: " + hosCumVal}else{hosCum.textContent = "Cumulative: N/A"};
+                
+                //create content divs
+                let div1 = document.createElement('div');
+                div1.style.margin = 'auto';
+                div1.appendChild(positive);
+                div1.appendChild(negative);
+                let div2 = document.createElement('div');
+                div2.style.margin = 'auto';
+                div2.appendChild(hosCurr);
+                div2.appendChild(hosCum);
+                
             
                 //append children
                 card.appendChild(abr);
                 card.appendChild(overallTitle);
-                card.appendChild(positive);
-                card.appendChild(negative);
+                card.appendChild(div1);
                 card.appendChild(hospitalTitle);
-                card.appendChild(hosCurr);
-                card.appendChild(hosCum);
+                card.appendChild(div2);
                 
                 
                 stateContain.appendChild(card);
@@ -483,6 +515,7 @@
         //functionality when get info button is clicked
         document.querySelector('.bar-button').addEventListener('click', event => {
             
+            
             if(window.navigator.onLine){
                 //make sure there is data to process
                 if(statesArray.length > 0){
@@ -516,6 +549,7 @@
 
 
                      //shift to state info screen
+                     cardViewHeader.textContent = "State Information";
                      hideViews();
                      clickedInfo = true;
                      document.querySelector('#two').style.display = "block";
@@ -555,6 +589,14 @@
                      }
                  }  
                  
+                 if(val == "two"){
+                     if(statesArray.length>0 || fetchedData.length>0){
+                        cardViewHeader.textContent = "State Information";
+                    }else{
+                        cardViewHeader.textContent = "**Please Select States For Info**";
+                    }
+                 }  
+                   
                  //console.log("showing...");  
                  document.querySelector("#"+val).style.display="block";
                    
@@ -620,7 +662,7 @@
                 vAxis: {
                   title: 'Confirmed Cases'
                 },
-                width: 900,
+                width: '100%',
                 height: 600
               };
 
