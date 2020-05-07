@@ -583,6 +583,7 @@
                  //geolocation routine
                  if(val == "three"){
                      if(window.navigator.onLine){
+                         console.log("going in func");
                          getGeolocationInfo();
                      }else{
                          alert("Cannot call weather API in offline");
@@ -610,6 +611,7 @@
             //geolocation function
             let getGeolocationInfo = () => {
                 if (navigator.geolocation) {
+                    console.log("About to geoloc");
                     navigator.geolocation.getCurrentPosition(showPosition);
                 } else {
                     alert("Geolocation is not supported by this browser.");
@@ -619,6 +621,7 @@
             //callback function to use weather api with coordinates
             let showPosition = (position) => {
                 let weatherUrl = "https://api.openweathermap.org/data/2.5/weather?lat="+position.coords.latitude+"&lon=" +position.coords.longitude+"&units=imperial&appid=b2413ddb608f02bb63cf6e2a9c922b62";
+                console.log("About to req");
                 fetch(weatherUrl)
                   .then(response => response.json())
                   .then(data => {
@@ -630,6 +633,7 @@
                     currTempLow.textContent = "Temp Low: " + data.main["temp_min"] + String.fromCharCode(176);
                     currHumidity.textContent = "Humidity: "+data.main.humidity + "%";
                     currWind.textContent = "Wind Speed: "+data.wind.speed + "mph";
+                    console.log(data);
                   })
                 .catch((error) => {
                    console.error('Error', error);
