@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
@@ -15,8 +15,8 @@
     <link rel="manifest" href="./manifest.json">
       
       
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript" src="./js/states.js"></script>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="./js/states.js"></script>
     
       <style>
         :root {--mdc-theme-primary: #3A0CA3;}
@@ -30,7 +30,7 @@
         #countriesAdded {width:500px}  
 
         .demo-card {
-            height: 435pxpx;
+            height: 435px;
             width: 350px;
             margin: auto;
             margin-bottom: 10px;
@@ -69,6 +69,7 @@
 
         <!--  Home Screen View  -->
         <div class="" id="home">
+            
            <h1>Welcome to my Covid-19 State Tracking App</h1>
             <p>Covid-19 data source can be found at <a href="https://covidtracking.com/api#states-historical-data" target="_blank">https://covidtracking.com/api#states-historical-data</a><br>
                Weather data source can be found at <a href="https://openweathermap.org/" target="_blank">https://openweathermap.org/</a></p>
@@ -104,6 +105,8 @@
         <!--  State Cards Information View  -->
         <div class="view" id="two">
            <h1 id="cardViewText"></h1>
+            
+            
            <div id="state-container"></div>
         </div>
 
@@ -116,7 +119,7 @@
                  <div class="mdc-card__media-content demo-card__media-content">
                    <div class="demo-card__primary">
                      <h1 class="demo-card__title mdc-typography mdc-typography--headline6" style="font-size: 26px;font-style: italic;">Current Weather</h1>
-                     <h1 class="demo-card__subtitle mdc-typography mdc-typography--subtitle2" id="currTemp" style="font-size: xxx-large;"></h1>
+                     <h1 class="demo-card__subtitle mdc-typography mdc-typography--subtitle2" id="currTemp" style="font-size: 47px;"></h1>
                    </div>
                  </div>
                </div>
@@ -583,7 +586,7 @@
                  //geolocation routine
                  if(val == "three"){
                      if(window.navigator.onLine){
-                         console.log("going in func");
+                         //console.log("going in func");
                          getGeolocationInfo();
                      }else{
                          alert("Cannot call weather API in offline");
@@ -611,7 +614,7 @@
             //geolocation function
             let getGeolocationInfo = () => {
                 if (navigator.geolocation) {
-                    console.log("About to geoloc");
+                    //console.log("About to geoloc");
                     navigator.geolocation.getCurrentPosition(showPosition);
                 } else {
                     alert("Geolocation is not supported by this browser.");
@@ -621,7 +624,7 @@
             //callback function to use weather api with coordinates
             let showPosition = (position) => {
                 let weatherUrl = "https://api.openweathermap.org/data/2.5/weather?lat="+position.coords.latitude+"&lon=" +position.coords.longitude+"&units=imperial&appid=b2413ddb608f02bb63cf6e2a9c922b62";
-                console.log("About to req");
+                //console.log("About to req");
                 fetch(weatherUrl)
                   .then(response => response.json())
                   .then(data => {
